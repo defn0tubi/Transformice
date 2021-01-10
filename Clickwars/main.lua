@@ -276,8 +276,8 @@ end
 
 
 function eventPlayerBonusGrabbed(player, bonusId)
+	local x, y = xyToCoord(bonusId)
 	tfm.exec.killPlayer(player)
-    local x, y = xyToCoord(bonusId)
     xyBonus(x, y, 0, player)
 end
 

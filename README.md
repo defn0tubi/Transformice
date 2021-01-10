@@ -4,3 +4,5 @@ Copy all the text inside the **.lua** file and paste it into **/lua** tab in you
 > /lua
 ###### How to use the script
 Read the instructions in the script's folder
+###### Performance tips
+Use [lua minier](https://mothereff.in/lua-minifier) to shorten your code and make it load faster in game. Required to use when your script exceeds 64k characters or else it won't launch!
