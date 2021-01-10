@@ -166,7 +166,7 @@ function resetRound()
 	suspendLogs = {}
 	scheduledTasks = {}
 
-	map = maps[2]--table.random(maps)
+	map = table.random(maps)
 
 	for k,v in next, playerData do
 		v.isDead = false -- player respawned
@@ -184,22 +184,15 @@ end
 
 
 function eventNewGame()
-	if map == maps[1] then
-		xyBonusFill(-40, -40, 840, -40) -- upper row
-		for y = -15, 430, 25 do -- left row
-			xyBonus(-40, y)
-		end
-		for y = -15, 430, 25 do -- right row
-			xyBonus(840, y)
-		end
-	else
-		xyBonusFill(-40, -40, 4840, -40) -- upper row
-		for y = -15, 840, 25 do -- left row
-			xyBonus(-40, y)
-		end
-		for y = -15, 840, 25 do -- right row
-			xyBonus(4840, y)
-		end
+	local width = tonumber(tfm.get.room.xmlMapInfo.xml:match('<P[^/]+L="([^"]+)"[^/]+/>')) or 800
+	local height = tonumber(tfm.get.room.xmlMapInfo.xml:match('<P[^/]+H="([^"]+)"[^/]+/>')) or 400
+
+	xyBonusFill(-40, -40, width+40, -40) -- upper row
+	for y = -15, height+40, 25 do -- left row
+		xyBonus(-40, y)
+	end
+	for y = -15, height+40, 25 do -- right row
+		xyBonus(width+40, y)
 	end
 
 	ui.setMapName("<CH>Clickwars - </CH><N>"..main.ver.."</N> Last Updated: "..main.last_updated)
