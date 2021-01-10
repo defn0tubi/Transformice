@@ -8,7 +8,7 @@ local main = {
 
 -- Libs
 
---[[Zigwin's Coordinates]]
+--[[Zigwin's Coordinates https://atelier801.com/topic?f=6&t=892672&p=1]]
 function xyBonus(a,b,c,d)local e=math.abs(a)*1000000+math.abs(b)*100+(a>0 and 0 or 10)+(b>0 and 0 or 1)tfm.exec.addBonus(0,a,b,e,c or 0,main.BordersShown,d)return e end;function xyToCoord(f)local g=f%1000000;local h=f%100;local i=f%10;local a=(f-g)/1000000*((h-i)/10==1 and-1 or 1)local b=(g-h)/100*(i==1 and-1 or 1)return a,b end;function xyBonusFill(j,k,l,m)for a=j or 0,l or 800,25 do for b=k or 0,m or 400,25 do xyBonus(a,b)end end end
 
 
