@@ -1,9 +1,16 @@
-local a = tfm.exec.addImage("17729f24684.png", "?1", 760, 17)
-ui.addTextArea(1, "<a href='event:options'>\t\t\t\t</a>", nil, 760, 17, 40, 40, 0x000000, 0x000000, 0, true)
+local images = {}
 
 
-eventTextAreaCallback = function(textAreaId, playerName, eventName)
-    if eventName == "options" then
-        ui.addTextArea(1, "Never gonna give you up", nil, 400, 200, 150, 150, 0x324650, 0x212F36, 1, true)
-    end
+eventNewPlayer = function(name)
+    system.bindMouse(name, true)
+end
+table.foreach(tfm.get.room.playerList, eventNewPlayer)
+
+
+eventMouse = function(n, x, y)
+    local obj = tfm.exec.addShamanObject(1, x, y, 0, 0, 0, false)
+    images[#images + 1] = tfm.exec.addImage('177460c3798.png', '#'..obj, -30, -35, nil)
+
+    print("\nBox:\n[X] "..x.."\n[Y] "..y)
+    print("\nImage:\n[X] "..(x-30).."\n[Y] "..y-35)
 end
