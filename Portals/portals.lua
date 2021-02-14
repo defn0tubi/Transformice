@@ -1,8 +1,6 @@
 tfm.exec.disableAutoShaman(true)
 tfm.exec.disablePhysicalConsumables(true)
---tfm.exec.newGame([[<C><P /><Z><S><S P="0,0,0.3,0.2,0,0,0,0" H="167" L="138" o="15a600" X="397" c="2" Y="293" T="12" /><S P="0,0,0.3,0.2,0,0,0,0" L="798" o="324650" X="400" H="27" Y="389" T="12" /></S><D><DS Y="360" X="13" /><F Y="370" X="180" /><T Y="375" X="733" /><F Y="370" X="688" /></D><O /></Z></C>]])
-tfm.exec.newGame([[<C><P dodue="" /><Z><S><S P="0,0,0.3,0.2,0,0,0,0" X="404" L="47" o="ff9b00" H="251" c="2" Y="244" T="12" /><S P="0,0,0.3,0.2,0,0,0,0" L="801" X="400" H="33" Y="385" T="0" /></S><D><F Y="363" X="25" /><F Y="363" X="65" /><F Y="363" X="105" /><DS Y="355" X="230" /><T Y="367" X="777" /></D><O /></Z></C>]])
-
+tfm.exec.newGame("@7719367")
  
 function eventPlayerDied(name)
     tfm.exec.respawnPlayer(name)
@@ -16,11 +14,11 @@ local xml
 local tm = os.time()
 local colors = {"15a600", "a69800", "ff9b00", "423520", "fff9"} -- colored grounds
 --------------------------------------
-local levels = {7697646, 7758437, 6070370, 7698072, 7758927, 7791618, 7699001, 7791556, 7791798, 7698245, 7758441, 7758484, 7759023, 7758420, 7796655, 7759281, 7758919, 7759615, 7761263, 7712060, 7759326, 7762166, 7760368, 7760342, 7791634, 7791038, 7791316, 7791005, 7791066, 7791278, 7824613 , 7824287, 7824273, 7824442, 7824658, 7824499, 7824499, 7824499, 7824499, 7824499, 7824499}
+local levels = {7697646, 7758437, 6070370, 7698072, 7758927, 7791618, 7699001, 7791556, 7791798, 7698245, 7758441, 7758484, 7759023, 7758420, 7796655, 7759281, 7758919, 7759615, 7761263, 7712060, 7759326, 7762166, 7760368, 7760342, 7791634, 7791038, 7791316, 7791005, 7791066, 7791278}
 --------------------------------------
 local adm
 do local _,name = pcall(nil)
-	adm = string.match(name, "(.-)%.")
+    adm = string.match(name, "(.-)%.")
 end
 
 
@@ -56,6 +54,17 @@ function eventPlayerBonusGrabbed(playerName, bonusId)
         if playerData.cheeses ~= #cheese then
             tfm.exec.killPlayer(playerName)
         end
+    
+
+    elseif bonus.other.attachedColor == "423520" then -- коричневый
+        if playerData.cheeses >= 2 then
+            tfm.exec.killPlayer(playerName)
+        end
+    
+
+    elseif bonus.other.attachedColor == "fff9" then -- голубой
+        tfm.exec.addShamanObject(26,0,0)
+        tfm.exec.addShamanObject(27,0,0)
     end
 
     -- Создать новый бонус на том же месте
@@ -77,7 +86,7 @@ function bonusAdd(id, x, y, playerName, other)
         other = other,
     }
 
-    tfm.exec.addBonus(0, x, y, id, 0, true, playerName)
+    tfm.exec.addBonus(0, x, y, id, 0, false, playerName)
     return id
 end
 
@@ -157,14 +166,12 @@ function eventNewGame()
     for k in next, tfm.get.room.playerList do
         loadMapBonus(k, xml)
     end
-
-    print(#Bonus["Aaa_bbb_ccc_ddd#2783"].list)
-    print(#grounds)
 end
 
 
 function eventMouse(name, x2, y2)
     if os.time() >= tm + 1000 then
+        local brk, stopSpawn
         local player = tfm.get.room.playerList[name]
         local deltaX = x2 - player.x
         local deltaY = y2 - player.y
@@ -177,10 +184,20 @@ function eventMouse(name, x2, y2)
             if x < 0 or x > width or y < 0 or y > height then
                 break
             end
-            for i,ground in ipairs(grounds) do
+            for i,ground in next, grounds do
+                if ground.T == 9 or ground.o and ground.o == "515151" or ground.o == "5a5a5a" then
+-- if player.x >= ground.X-ground.L/2 and player.x <= ground.X+ground.L/2 and player.y+5 >= ground.Y and player.y+5 <= ground.Y+ground.H then
+                    if player.x > ground.X - ground.L/2 and player.x < ground.X + ground.L/2 and player.y > ground.Y - ground.H/2 and player.y < ground.Y + ground.H/2 then
+                        stopSpawn = true
+                        break
+                    end
+                end
                 if x > ground.X - ground.L/2 and x < ground.X + ground.L/2 and y > ground.Y - ground.H/2 and y < ground.Y + ground.H/2 and ground.T ~= (8 or 9) then 
                     brk = true
                 end
+            end
+            if stopSpawn then
+                return
             end
             if brk then
                 brk = false
@@ -197,15 +214,15 @@ function eventMouse(name, x2, y2)
                 end
                 break
             end
-        if not prtl then
-            tfm.exec.displayParticle(9, x , y, 0, 0, 0, 0)
-        else
-            tfm.exec.displayParticle(2, x , y, 0, 0, 0, 0)
+            if not prtl then
+                tfm.exec.displayParticle(9, x , y, 0, 0, 0, 0)
+            else
+                tfm.exec.displayParticle(2, x , y, 0, 0, 0, 0)
+            end
         end
-    end
  
-    tm = os.time()
-end
+        tm = os.time()
+    end
 end
  
  
@@ -255,20 +272,17 @@ eventTextAreaCallback = function(id, playerName, name, b)
         ui.addTextArea(112,"- Убить себя",playerName, 260,270,200,20,0,0,0,true)
         ui.addTextArea(113,"- Стереть порталы",playerName, 240,310,200,20,0,0,0,true)
         ui.addTextArea(109,"<a href='event:close1'> X", playerName, 610,60,20,20,0,0,0,true)
-    end
  
-    if name == "close1" then
+    elseif name == "close1" then
         for i=100,117 do ui.removeTextArea(1*i,playerName) end
-    end
  
-    if name == "click" then
+    elseif name == "click" then
         ui.addTextArea(-1," ", playerName, 185,70,470,340,0,0xFFFFFF,0.5,true)
         ui.addTextArea(-2,"Список карт:", playerName, 200,80,400,200,0,0,0,true)
         ui.addTextArea(-3,"Первая локация:", playerName, 200,100,400,200,0,0,0,true)
         ui.addTextArea(-4,"Вторая локация:", playerName, 200,160,400,200,0,0,0,true)
         ui.addTextArea(-5,"Третья локация:", playerName, 200,220,400,200,0,0,0,true)
         ui.addTextArea(-6,"Локация ''Космос'':", playerName, 200,280,400,200,0,0,0,true)
-        ui.addTextArea(-25,"Локация ''?''", playerName, 200,340,400,200,0,0,0,true)
         ui.addTextArea(-7,"Сложность:", playerName, 550,100,400,200,0,0,0,true)
         ui.addTextArea(-8,"Очень легкий", playerName, 520,120,400,200,0,0,0,true)
         ui.addTextArea(-9,"Легкий", playerName, 520,140,400,200,0,0,0,true)
@@ -289,21 +303,19 @@ eventTextAreaCallback = function(id, playerName, name, b)
             [1] = 10,
             [2] = 7,
             [3] = 7,
-				[4] = 6,
-            [5] = 10
+            [4] = 6
         }
  
         local colors = {
             [1] = {'00FFD5', '00FFD5', '38FF00', '38FF00', '38FF00', 'FFA100', 'FFA100', 'FFA100', 'FF0500', 'FF0500'},
             [2] = {'38FF00', 'FFA100', 'FFA100', 'FF0500', 'FFA100', 'FFA100', 'FF0500'},
             [3] = {'FFA100', 'FFA100', 'FF0500', 'FF0500', 'FFA100', 'FF0500', 'F700FF'},
-         	[4] = {'FFA100', 'FFA100', 'FF0500', 'FF0500', 'FF0500', 'F700FF'},   	
-				[5] = {'FF0500', 'FF0500', 'F700FF', 'FF0500', 'F700FF', 'A2A2A2', 'A2A2A2', 'A2A2A2', 'A2A2A2', 'A2A2A2'}
-			
+            [4] = {'FFA100', 'FFA100', 'FF0500', 'FF0500', 'FF0500', 'F700FF'}  	
         }
  
-        for y = 1, 5 do
-            local bgColor = y == 5 and 0x165B00 or 0x434343 and y == 4 and 0x9100FF or 0x434343
+        for y = 1, 4 do
+            local bgColor = y == 4 and 0x9100FF or 0x434343
+
  
             for i = 1, stages[y] do
                 ui.addTextArea(id,"<p align='center'><a href='event:map"..mapId.."'><font color='#"..colors[y][i].."'>"..i.."</font></p>", playerName, 170+i*30,70+y*60,18,18,0,bgColor,0.5,true)
@@ -315,41 +327,36 @@ eventTextAreaCallback = function(id, playerName, name, b)
         ui.addTextArea(-19,"<a href='event:close'> Х", playerName, 630,80,18,18,0,0,0,true)
         ui.addTextArea(-20,"<a href='event:killall'> Убить всеx", playerName, 520,230,80,18,0,0xFF0000,0.5,true)
         ui.addTextArea(-21,"<a href='event:crash'> Краш", playerName, 520,260,45,18,0,0xFF0000,0.5,true)
- 		end
-    if name == "killall" then
+
+    elseif name == "killall" then
         for playerName in pairs(tfm.get.room.playerList) do
             tfm.exec.killPlayer(playerName)
         end
-    end
+
  
-    if name == "crash" then
+    elseif name == "crash" then
         ui.removeTextArea(-21, playerName)
         ui.addTextArea(-22,"Подтвердить?", playerName, 540,260,100,18,0,0,0,true)
         ui.addTextArea(-23,"<a href='event:yes'> Да", playerName, 520,290,28,18,0,0xFF0000,0.5,true)
         ui.addTextArea(-24,"<a href='event:no'> Нет", playerName, 610,290,33,18,0,0x20FF00,0.5,true)
-    end
  
-    if name == "yes" then
+    elseif name == "yes" then
         tfm.exec.newGame("@7768958")
         ui.addTextArea(-21,"<a href='event:crash'> Краш", playerName, 520,280,45,18,0,0xFF0000,0.5,true)
         for i=22,24 do ui.removeTextArea(-1*i,playerName) end
-    end
  
-    if name == "no" then
+    elseif name == "no" then
         ui.addTextArea(-21,"<a href='event:crash'> Краш", playerName, 520,260,45,18,0,0xFF0000,0.5,true)
         for i=22,24 do ui.removeTextArea(-1*i,playerName) end
-    end
  
-    if name == "mapStartMenu" then
+    elseif name == "mapStartMenu" then
         tfm.exec.newGame("@7719367")
-    end
  
-    if name:match("map%d+") then
+    elseif name:match("map%d+") then
         local key = tonumber(name:match("%d+"))
         tfm.exec.newGame(levels[key])
-    end
  
-    if name == "close" then
+    elseif name == "close" then
         for i=1,65 do ui.removeTextArea(-1*i,playerName) end
     end
  
@@ -359,32 +366,30 @@ end
 function eventKeyboard(playerName,keyCode,down,xPlayerPosition,yPlayerPosition)
     if (keyCode == 46) then
         tfm.exec.killPlayer(playerName)
-    end
  
-    if (keyCode == 78) then
+    elseif (keyCode == 78) then
         for playerName in pairs(tfm.get.room.playerList) do
             tfm.exec.killPlayer(playerName) 
             tfm.exec.disableAutoNewGame(true)
-        end
-    end
- 
-    if (keyCode == 81) then
+        end    
+
+    elseif (keyCode == 81) then
         tfm.exec.addShamanObject(26,0,0)
         tfm.exec.addShamanObject(27,0,0)
     end
 end
 
 function eventChatCommand(name, message)
-		if name == adm then
-			if message:sub(0,4) == "kill" then
- 			if message:sub(6) ~= "" then
-  			  tfm.exec.killPlayer(message:sub(6))
-				end
-  		end
-			if message:sub(0,4) == "stop" then
-				system.exit()
-			end
-		end
+    if name == adm then
+        if message:sub(0,4) == "kill" then
+            if message:sub(6) ~= "" then
+                tfm.exec.killPlayer(message:sub(6))
+            end
+        end
+        if message:sub(0,4) == "stop" then
+            system.exit()
+        end
+    end
 end
 
 system.disableChatCommandDisplay("kill",true)
