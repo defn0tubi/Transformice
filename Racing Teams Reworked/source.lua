@@ -282,7 +282,7 @@ end
 
 
 checkPlayers = function()
-	for k, v in next, playerData do
+	for k, v in next, room.playerData do
 		if not v.inGame then
 			tfm.exec.killPlayer(k)
 		end
